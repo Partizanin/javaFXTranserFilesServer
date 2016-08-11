@@ -3,11 +3,11 @@ package sample;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
-import sample.company.Client;
+import sample.company.Server;
 
 public class Controller {
 
-    private Client client = new Client(this);
+    private Server  server = new Server(this);
 
     @FXML
     public TextArea messageArea;
@@ -28,8 +28,8 @@ public class Controller {
         }
     }
 
-    public void setSendButton() {
-        client.sendFile();
+    public void sendButtonAction() {
+        server.start();
     }
 
     public void sendMessage(String message, String color) {
