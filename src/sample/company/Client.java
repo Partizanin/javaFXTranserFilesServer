@@ -52,7 +52,7 @@ public class Client {
                 logMessage = df.format(new Date()) + " Знайдено файл: " + fileName;
 
                 System.out.println(logMessage);
-                controller.sendMessage(logMessage);
+                controller.sendLog(logMessage);
 
                 //write file names
                 dos.writeUTF(fileName);
@@ -68,7 +68,8 @@ public class Client {
                 dos.flush();
                 dos.close();
                 logMessage = df.format(new Date()) + " Передано файл: " + fileName;
-                controller.sendMessage(logMessage);
+                controller.sendLog(logMessage);
+
                 System.out.println(logMessage);
 
             } catch (IOException e) {
@@ -77,6 +78,11 @@ public class Client {
 
 
         }
+        logMessage = df.format(new Date()) + " Файлы успешно переданы!!!";
+        controller.sendMessage(logMessage,"green");
+
+
+
     }
 
 }
