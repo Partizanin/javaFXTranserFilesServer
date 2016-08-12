@@ -18,6 +18,10 @@ public class Controller {
 
     public Controller() {
         messageArea = new TextArea();
+        textArea = new TextArea();
+
+        server.start();
+
     }
 
     private void changeColor(String color) {
@@ -29,7 +33,7 @@ public class Controller {
     }
 
     public void sendButtonAction() {
-        server.start();
+        System.out.println("Send button");
     }
 
     public void sendMessage(String message, String color) {
