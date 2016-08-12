@@ -11,6 +11,9 @@ import java.util.Date;
 
 public class Server {
     private Controller controller;
+    private Thread serverThread;
+    private ServerSocket serverSocket = null;
+
     private static SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 
     public Server() {
@@ -41,25 +44,28 @@ public class Server {
 
     public void start() {
         String logMessage = "";
+        String errorMessage = "";
+
         logMessage = df.format(new Date()) + " Запуск сервера ";
         sendLog(logMessage);
         System.out.println(logMessage);
 
-
-        ServerSocket serverSocket = null;
+        serverSocket = null;
         try {
             serverSocket = new ServerSocket(4444);
         } catch (IOException e) {
+            errorMessage = e.getMessage();
+            sendMessage(errorMessage,"red");
             e.printStackTrace();
         }
         logMessage = df.format(new Date()) + " Створення підключення";
         sendLog(logMessage);
         System.out.println(logMessage);
 
-        final ServerSocket finalServerSocket = serverSocket;
-        Thread serverThread = new Thread() {
+         serverThread = new Thread() {
             @Override
             public void run() {
+                String errorMessage = "";
                 String logMessage = "";
                 while (true) {
                     Socket clientSocket = null;
@@ -68,9 +74,11 @@ public class Server {
                     System.out.println(logMessage);
 
                     try {
-                        clientSocket = finalServerSocket.accept();
+                        clientSocket = serverSocket.accept();
                     } catch (IOException e) {
                         e.printStackTrace();
+                        errorMessage = e.getMessage();
+                        sendMessage(errorMessage,"red");
                     }
 
                     InputStream in = null;
@@ -78,6 +86,8 @@ public class Server {
                         in = clientSocket.getInputStream();
                     } catch (IOException e) {
                         e.printStackTrace();
+                        errorMessage = e.getMessage();
+                        sendMessage(errorMessage,"red");
                     }
 
                     DataInputStream clientData = new DataInputStream(in);
@@ -91,6 +101,8 @@ public class Server {
                         fileName = clientData.readUTF();
                     } catch (IOException e) {
                         e.printStackTrace();
+                        errorMessage = e.getMessage();
+                        sendMessage(errorMessage,"red");
                     }
                     String filePath = "D:\\test\\result\\" + fileName;
 
@@ -99,6 +111,8 @@ public class Server {
                         output = new FileOutputStream(filePath);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
+                        errorMessage = e.getMessage();
+                        sendMessage(errorMessage,"red");
                     }
 
                     logMessage = df.format(new Date()) + " Прийнято файл " + fileName;
@@ -110,6 +124,8 @@ public class Server {
                         size = clientData.readLong();
                     } catch (IOException e) {
                         e.printStackTrace();
+                        errorMessage = e.getMessage();
+                        sendMessage(errorMessage,"red");
                     }
                     byte[] buffer = new byte[1024];
                     int bytesRead;
@@ -120,6 +136,8 @@ public class Server {
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
+                        errorMessage = e.getMessage();
+                        sendMessage(errorMessage,"red");
                     }
                     logMessage = df.format(new Date()) + " Записано файл " + filePath + "\n";
                     sendLog(logMessage);
@@ -130,22 +148,41 @@ public class Server {
                         in.close();
                     } catch (IOException e) {
                         e.printStackTrace();
+                        errorMessage = e.getMessage();
+                        sendMessage(errorMessage,"red");
                     }
                     try {
                         clientData.close();
                     } catch (IOException e) {
                         e.printStackTrace();
+                        errorMessage = e.getMessage();
+                        sendMessage(errorMessage,"red");
                     }
                     try {
                         output.close();
                     } catch (IOException e) {
                         e.printStackTrace();
+                        errorMessage = e.getMessage();
+                        sendMessage(errorMessage,"red");
                     }
                     sendMessage("Файл " + fileName + " успешно принят", "green");
                 }
             }
         };
         serverThread.start();
+    }
+
+    public void closeSocket() {
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getSocket() {
+        serverThread.interrupt();
+        return "serverSocket.isClosed() = " + String.valueOf(serverSocket.isClosed()) + " \nserverThread.isAlive() " + serverThread.isAlive() + "\n";
     }
 }
 

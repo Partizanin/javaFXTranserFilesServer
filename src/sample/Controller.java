@@ -1,13 +1,18 @@
 package sample;
 
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import sample.company.Server;
 
 public class Controller {
 
-    private Server  server = new Server(this);
+    private Server server = new Server(this);
 
     @FXML
     public TextArea messageArea;
@@ -15,6 +20,21 @@ public class Controller {
     public TextArea textArea;
     @FXML
     public Button sendButton;
+
+    public void setStageAndSetupListeners(Stage primaryStage) {
+
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                server.closeSocket();
+                System.out.println(server.getSocket() + " Stage is closing");
+            }
+        });
+      /*  primaryStage.setOnCloseRequest((WindowEvent we) -> {
+            System.out.println("Stage is closing");
+        });*/
+    }
+
 
     public Controller() {
         messageArea = new TextArea();
