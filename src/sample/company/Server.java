@@ -126,8 +126,8 @@ public class Server {
                     try {
                         size = clientData.readLong();
                     } catch (IOException e) {
-                        errorMessage = e.toString()  + " \n" +  Arrays.toString(e.getStackTrace());
-                        sendMessage(errorMessage,"red");
+                        errorMessage = e.toString() + " \n" + Arrays.toString(e.getStackTrace());
+                        sendMessage(errorMessage, "red");
                         e.printStackTrace();
                     }
                     byte[] buffer = new byte[1024];
@@ -139,7 +139,8 @@ public class Server {
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
-                        errorMessage = e.getMessage();
+                        errorMessage = e.toString() + " \n" + Arrays.toString(e.getStackTrace());
+
                         sendMessage(errorMessage, "red");
                     }
                     logMessage = df.format(new Date()) + " Записано файл " + filePath + "\n";
@@ -147,27 +148,18 @@ public class Server {
                     System.out.println(logMessage);
 
                     // Closing the FileOutputStream handle
+
                     try {
                         in.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        errorMessage = e.getMessage();
-                        sendMessage(errorMessage, "red");
-                    }
-                    try {
                         clientData.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        errorMessage = e.getMessage();
-                        sendMessage(errorMessage, "red");
-                    }
-                    try {
+                        assert output != null;
                         output.close();
                     } catch (IOException e) {
                         e.printStackTrace();
-                        errorMessage = e.getMessage();
+                        errorMessage = e.toString() + " \n" + Arrays.toString(e.getStackTrace());
                         sendMessage(errorMessage, "red");
                     }
+
                     if (errorMessage.length() < 2) {
                         sendMessage("Файл " + fileName + " успішно принятий", "green");
                     }
