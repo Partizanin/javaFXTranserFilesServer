@@ -9,10 +9,11 @@ import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import sample.company.Server;
+import sample.company.TCPSocketServer;
 
 public class Controller {
 
-    private Server server = new Server(this);
+    private TCPSocketServer server = new TCPSocketServer(this);
 
     @FXML
     public TextArea messageArea;
@@ -40,7 +41,7 @@ public class Controller {
         messageArea = new TextArea();
         textArea = new TextArea();
 
-        server.start();
+        server.getFilesFromStation();
 
     }
 
@@ -61,7 +62,7 @@ public class Controller {
         messageArea.appendText(message + "\n");
     }
 
-    public void sendLog(String log) {
+    public  void sendLog(String log) {
         textArea.appendText(log + "\n");
     }
 }

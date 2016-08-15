@@ -55,14 +55,14 @@ public class Server {
             serverSocket = new ServerSocket(4444);
         } catch (IOException e) {
             errorMessage = e.getMessage();
-            sendMessage(errorMessage,"red");
+            sendMessage(errorMessage, "red");
             e.printStackTrace();
         }
         logMessage = df.format(new Date()) + " Створення підключення";
         sendLog(logMessage);
         System.out.println(logMessage);
 
-         serverThread = new Thread() {
+        serverThread = new Thread() {
             @Override
             public void run() {
                 String errorMessage = "";
@@ -78,7 +78,7 @@ public class Server {
                     } catch (IOException e) {
                         e.printStackTrace();
                         errorMessage = e.getMessage();
-                        sendMessage(errorMessage,"red");
+                        sendMessage(errorMessage, "red");
                     }
 
                     InputStream in = null;
@@ -87,7 +87,7 @@ public class Server {
                     } catch (IOException e) {
                         e.printStackTrace();
                         errorMessage = e.getMessage();
-                        sendMessage(errorMessage,"red");
+                        sendMessage(errorMessage, "red");
                     }
 
                     DataInputStream clientData = new DataInputStream(in);
@@ -102,7 +102,7 @@ public class Server {
                     } catch (IOException e) {
                         e.printStackTrace();
                         errorMessage = e.getMessage();
-                        sendMessage(errorMessage,"red");
+                        sendMessage(errorMessage, "red");
                     }
                     String filePath = "D:\\test\\result\\" + fileName;
 
@@ -112,7 +112,7 @@ public class Server {
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                         errorMessage = e.getMessage();
-                        sendMessage(errorMessage,"red");
+                        sendMessage(errorMessage, "red");
                     }
 
                     logMessage = df.format(new Date()) + " Прийнято файл " + fileName;
@@ -125,7 +125,7 @@ public class Server {
                     } catch (IOException e) {
                         e.printStackTrace();
                         errorMessage = e.getMessage();
-                        sendMessage(errorMessage,"red");
+                        sendMessage(errorMessage, "red");
                     }
                     byte[] buffer = new byte[1024];
                     int bytesRead;
@@ -137,7 +137,7 @@ public class Server {
                     } catch (IOException e) {
                         e.printStackTrace();
                         errorMessage = e.getMessage();
-                        sendMessage(errorMessage,"red");
+                        sendMessage(errorMessage, "red");
                     }
                     logMessage = df.format(new Date()) + " Записано файл " + filePath + "\n";
                     sendLog(logMessage);
@@ -146,25 +146,14 @@ public class Server {
                     // Closing the FileOutputStream handle
                     try {
                         in.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        errorMessage = e.getMessage();
-                        sendMessage(errorMessage,"red");
-                    }
-                    try {
                         clientData.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        errorMessage = e.getMessage();
-                        sendMessage(errorMessage,"red");
-                    }
-                    try {
                         output.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                         errorMessage = e.getMessage();
-                        sendMessage(errorMessage,"red");
+                        sendMessage(errorMessage, "red");
                     }
+
                     sendMessage("Файл " + fileName + " успешно принят", "green");
                 }
             }
