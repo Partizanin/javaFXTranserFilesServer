@@ -13,7 +13,7 @@ import sample.company.TCPSocketServer;
 
 public class Controller {
 
-    private TCPSocketServer server = new TCPSocketServer(this);
+    private TCPSocketServer server ;
 
     @FXML
     public TextArea messageArea;
@@ -22,7 +22,7 @@ public class Controller {
     @FXML
     public Button sendButton;
 
-    public void setStageAndSetupListeners(Stage primaryStage) {
+    void setStageAndSetupListeners(Stage primaryStage) {
 
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
@@ -40,9 +40,17 @@ public class Controller {
     public Controller() {
         messageArea = new TextArea();
         textArea = new TextArea();
+        final Controller controller = this;
 
-        server.getFilesFromStation();
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+                server = new TCPSocketServer(controller);
+                server.getFilesFromStation();
+            }
+        };
 
+        thread.start();
     }
 
     private void changeColor(String color) {
