@@ -7,8 +7,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Properties;
 
 public class TCPSocketServer {
     private ServerSocket serverSocket = null;
@@ -26,6 +25,12 @@ public class TCPSocketServer {
 
     public TCPSocketServer() {
 
+    }
+
+    public TCPSocketServer(Controller controller) {
+        this.controller = controller;
+        communicate();
+        communicate2();
     }
 
     private void sendLog(final String logMessage) {
@@ -47,12 +52,6 @@ public class TCPSocketServer {
         });
     }
 
-    public TCPSocketServer(Controller controller) {
-        this.controller = controller;
-        communicate();
-        communicate2();
-    }
-
    /* public static void main(String[] args) {
         new TCPSocketServer().communicate();
     }*/
@@ -63,12 +62,15 @@ public class TCPSocketServer {
             @Override
             public void run() {
                 try {
-                    serverSocket = new ServerSocket(4445);
-                    sendLog(utils.getCurrentDateTime() + " Запуск сервера ");
+                    serverSocket = new ServerSocket(Integer.parseInt(getProperties()[0]));
+                    sendLog(utils.getCurrentDateTime() + " Запуск сервера " + serverSocket.getLocalSocketAddress());
                     while (true) {
-                        sendLog(utils.getCurrentDateTime() + " Очікування підключення ");
+                        sendLog(utils.getCurrentDateTime() + " Очікування підключення клієнтів ");
 
                         socket = serverSocket.accept();
+                        String logMessage = utils.getCurrentDateTime() + " " + socket.getInetAddress() +
+                                " Клієнт підключено \n";
+                        System.out.println(logMessage);
 
                         sendLog(utils.getCurrentDateTime() + " " + socket.getInetAddress() +
                                 " Клієнт підключено \n");
@@ -76,6 +78,7 @@ public class TCPSocketServer {
                         inStream = new ObjectInputStream(socket.getInputStream());
 
                         transferObject = (TransferObject) inStream.readObject();
+                        System.out.println(transferObject);
 
                         if (transferObject.getMessage().equals("stop")) {
                             break;
@@ -101,7 +104,7 @@ public class TCPSocketServer {
             public void run() {
                 int fileCounter = -1;
                 try {
-                    readServerSocket = new ServerSocket(4446);
+                    readServerSocket = new ServerSocket(Integer.parseInt(getProperties()[1]));
                     while (true) {
                         readSocket = readServerSocket.accept();
                         readInStream = readSocket.getInputStream();
@@ -110,7 +113,7 @@ public class TCPSocketServer {
 
                         String fileName = null;
                         fileName = dataInputStream.readUTF();
-                        String filePath = "D:\\ARMVZ_SL\\Obmen\\Export\\test\\";
+                        String filePath = getProperties()[2];
                         filePath += fileName;
                         readOuStream = new FileOutputStream(filePath);
 
@@ -185,11 +188,41 @@ public class TCPSocketServer {
         }
     }
 
+    private String[] getProperties() {
+        String[] result = null;
+        Properties prop = new Properties();
+        InputStream input = null;
+
+        try {
+
+            input = getClass().getClassLoader().getResourceAsStream("settings.properties");
+
+            // load a properties file
+            prop.load(input);
+
+            result = new String[prop.size()];
+            // get the property value and print it out
+
+            result[0] = prop.getProperty("server.port");
+            result[1] = prop.getProperty("transferServer.port");
+            result[2] = prop.getProperty("files.movingPath");
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return result;
+    }
+
     public void getFilesFromStation() {
         /*todo: Отправить запрос на получение файлов из отделения*/
     }
 
-    public String getSocket() {
-        return serverSocket.toString() + " " + socket.toString();
-    }
 }
