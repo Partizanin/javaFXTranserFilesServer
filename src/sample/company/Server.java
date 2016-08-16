@@ -7,7 +7,9 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Properties;
 
 public class Server {
     private Controller controller;
@@ -52,7 +54,7 @@ public class Server {
 
         serverSocket = null;
         try {
-            serverSocket = new ServerSocket(4444);
+            serverSocket = new ServerSocket(Integer.parseInt(getProps()[0]));
         } catch (IOException e) {
             errorMessage = e.getMessage();
             sendMessage(errorMessage, "red");
@@ -104,7 +106,8 @@ public class Server {
                         errorMessage = e.getMessage();
                         sendMessage(errorMessage, "red");
                     }
-                    String filePath = "D:\\test\\result\\" + fileName;
+                    String filePath = getProps()[1];
+                    filePath += fileName;
 
                     OutputStream output = null;
                     try {
@@ -123,9 +126,9 @@ public class Server {
                     try {
                         size = clientData.readLong();
                     } catch (IOException e) {
-                        e.printStackTrace();
-                        errorMessage = e.getMessage();
+                        errorMessage = e.toString() + " \n" + Arrays.toString(e.getStackTrace());
                         sendMessage(errorMessage, "red");
+                        e.printStackTrace();
                     }
                     byte[] buffer = new byte[1024];
                     int bytesRead;
@@ -136,7 +139,8 @@ public class Server {
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
-                        errorMessage = e.getMessage();
+                        errorMessage = e.toString() + " \n" + Arrays.toString(e.getStackTrace());
+
                         sendMessage(errorMessage, "red");
                     }
                     logMessage = df.format(new Date()) + " Записано файл " + filePath + "\n";
@@ -144,21 +148,40 @@ public class Server {
                     System.out.println(logMessage);
 
                     // Closing the FileOutputStream handle
+
                     try {
                         in.close();
                         clientData.close();
+                        assert output != null;
                         output.close();
                     } catch (IOException e) {
                         e.printStackTrace();
-                        errorMessage = e.getMessage();
+                        errorMessage = e.toString() + " \n" + Arrays.toString(e.getStackTrace());
                         sendMessage(errorMessage, "red");
                     }
 
-                    sendMessage("Файл " + fileName + " успешно принят", "green");
+                    if (errorMessage.length() < 2) {
+                        sendMessage("Файл " + fileName + " успішно принятий", "green");
+                    }
                 }
             }
         };
         serverThread.start();
+    }
+
+    private String[] getProps() {
+        Properties prop = new Properties();
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("settings.properties");
+        try {
+            prop.load(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String serverPort = prop.getProperty("server.port");
+        String filesFolderPath = prop.getProperty("files.path");
+
+        return new String[]{serverPort, filesFolderPath};
     }
 
     public void closeSocket() {
