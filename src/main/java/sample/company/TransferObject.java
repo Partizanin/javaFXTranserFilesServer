@@ -36,7 +36,7 @@ class TransferObject implements Serializable {
 
     }
 
-    public void addFile(File file){
+    public void addFile(File file) {
         files.add(file);
     }
 

@@ -12,11 +12,10 @@ import java.util.Date;
 import java.util.Properties;
 
 public class Server {
+    private static SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
     private Controller controller;
     private Thread serverThread;
     private ServerSocket serverSocket = null;
-
-    private static SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 
     public Server() {
     }

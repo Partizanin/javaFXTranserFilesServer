@@ -8,8 +8,12 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    public static void main(String[] args) {
+        launch(args);
+    }
+
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("sample.fxml"));
         Parent root = loader.load();
         primaryStage.setTitle("Сервер відпраки пошит");
@@ -22,10 +26,5 @@ public class Main extends Application {
 Parent root = (Parent)loader.load();
 MyController controller = (MyController)loader.getController();
 controller.setStageAndSetupListeners(stage);*/
-    }
-
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }

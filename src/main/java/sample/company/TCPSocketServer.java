@@ -52,9 +52,7 @@ public class TCPSocketServer {
         });
     }
 
-   /* public static void main(String[] args) {
-        new TCPSocketServer().communicate();
-    }*/
+   /*ftp://10.209.11.213/incoming/ASRK/in*/
 
     private void communicate() {
         Thread communicateThread = new Thread() {
