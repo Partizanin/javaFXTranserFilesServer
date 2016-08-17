@@ -22,8 +22,11 @@ public class Utils {
     public static void main(String[] args) {
         FTPClient ftpClient = new FTPClient();
         try {
-            ftpClient.connect("10.209.11.213", 21);
-            ftpClient.login("guest", "123123");
+            ftpClient.connect("192.168.2.213", 21);
+            System.out.println(ftpClient.getReplyString());
+            System.out.println("login: " + ftpClient.login("anonymous", "123123"));/*todo:"login:anonymous; password: """ is connected to ftp*/
+            System.out.println("changeWorkingDirectory: " +
+                    ftpClient.changeWorkingDirectory("incoming\\ASRK\\in"));
 
             for (FTPFile ftpFile : ftpClient.listDirectories()) {
                 System.out.println(ftpFile);
