@@ -2,12 +2,12 @@ package sample.company;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * Created with Intellij IDEA.
@@ -18,25 +18,6 @@ import java.util.Date;
  */
 public class Utils {
     private SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
-
-    public static void main(String[] args) {
-        FTPClient ftpClient = new FTPClient();
-        try {
-            ftpClient.connect("192.168.2.213", 21);
-            System.out.println(ftpClient.getReplyString());
-            System.out.println("login: " + ftpClient.login("anonymous", "123123"));/*todo:"login:anonymous; password: """ is connected to ftp*/
-            System.out.println("changeWorkingDirectory: " +
-                    ftpClient.changeWorkingDirectory("incoming\\ASRK\\in"));
-
-            for (FTPFile ftpFile : ftpClient.listDirectories()) {
-                System.out.println(ftpFile);
-            }
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public String getCurrentDateTime() {
         return df.format(new Date());
@@ -62,11 +43,10 @@ public class Utils {
     }
 
     private void sendFileToFTP() {
-        /*ftp://10.209.11.213/incoming/ASRK/in*/
-        String server = "\\10.209.11.213\\incoming\\ASRK\\in\\";
-        int port = 21;
-        String user = "guest";
-        String pass = "123123";
+        String server = getFTPIpAddress();
+        int port = getFTPPort();
+        String user = getFTPUserName();
+        String pass = getFTPPassword();
 
         FTPClient ftpClient = new FTPClient();
         try {
@@ -74,11 +54,14 @@ public class Utils {
             ftpClient.connect(server, port);
             ftpClient.login(user, pass);
             ftpClient.enterLocalPassiveMode();
+            System.out.println("changeWorkingDirectory: " +
+                    ftpClient.changeWorkingDirectory(getFTPFileDirectory()));
+
 
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
             // APPROACH #1: uploads first file using an InputStream
-            File firstLocalFile = new File("D:/Test/Projects.zip");
+            File firstLocalFile = new File("D:/test/Projects.zip");
 
             String firstRemoteFile = "Projects.zip";
             InputStream inputStream = new FileInputStream(firstLocalFile);
@@ -87,12 +70,12 @@ public class Utils {
             boolean done = ftpClient.storeFile(firstRemoteFile, inputStream);
             inputStream.close();
             if (done) {
-                System.out.println("The first file is uploaded successfully.");
+                System.out.println("The first file \"Projects.zip\"is uploaded successfully.");
             }
 
             // APPROACH #2: uploads second file using an OutputStream
-            File secondLocalFile = new File("E:/Test/Report.doc");
-            String secondRemoteFile = "test/Report.doc";
+            File secondLocalFile = new File("D:/test/Report.doc");
+            String secondRemoteFile = "Report.doc";
             inputStream = new FileInputStream(secondLocalFile);
 
 
@@ -109,7 +92,7 @@ public class Utils {
 
             boolean completed = ftpClient.completePendingCommand();
             if (completed) {
-                System.out.println("The second file is uploaded successfully.");
+                System.out.println("The second file \"test/Report.doc\"is uploaded successfully.");
             }
 
         } catch (IOException ex) {
@@ -125,6 +108,56 @@ public class Utils {
                 ex.printStackTrace();
             }
         }
+    }
+
+    private String getFTPFileDirectory() {
+        return getProperties("ftp.filePath");
+    }
+
+    private String getFTPPassword() {
+        return getProperties("ftp.password");
+    }
+
+    private String getFTPUserName() {
+        return getProperties("ftp.userName.login");
+    }
+
+    private int getFTPPort() {
+        return Integer.parseInt(getProperties("ftp.port"));
+    }
+
+    private String getProperties(String key) {
+        String result = "";
+        Properties prop = new Properties();
+        InputStream input = null;
+
+        try {
+
+            input = getClass().getClassLoader().getResourceAsStream("settings.properties");
+
+            // load a properties file
+            prop.load(input);
+            // get the property value and print it out
+
+            result = prop.getProperty(key);
+
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return result;
+    }
+
+    private String getFTPIpAddress() {
+        return getProperties("ftp.ipAddress");
     }
 
 }
